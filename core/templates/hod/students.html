@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Students{% endblock %}
+{% block page_title %}All Students{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table mb-0">
+            <thead><tr><th>Roll No</th><th>Name</th><th>Email</th><th>Department</th><th>Semester</th></tr></thead>
+            <tbody>
+            {% for s in students %}
+                <tr>
+                    <td>{{ s.roll_number }}</td>
+                    <td>{{ s.user.get_full_name|default:s.user.username }}</td>
+                    <td>{{ s.user.email }}</td>
+                    <td>{{ s.department.name|default:"-" }}</td>
+                    <td>{{ s.semester }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5" class="text-center text-muted py-4">No students.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% block title %}Mark Attendance{% endblock %}
+{% block page_title %}Mark Attendance (Bulk){% endblock %}
+{% block content %}
+
+{% if not subjects %}
+<div class="alert alert-warning">
+    <i class="fas fa-exclamation-triangle"></i> No subjects assigned. Contact admin.
+</div>
+{% else %}
+
+<div class="card mb-4">
+    <div class="card-header"><i class="fas fa-filter"></i> Select Class</div>
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-5">
+                <label class="form-label">Subject</label>
+                <select name="subject" class="form-select" required>
+                    <option value="">-- Select Subject --</option>
+                    {% for s in subjects %}
+                        <option value="{{ s.id }}" {% if selected_subject and selected_subject.id == s.id %}selected{% endif %}>
+                            {{ s.code }} - {{ s.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Date</label>
+                <input type="date" name="date" value="{{ selected_date }}" class="form-control" required>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search"></i> Load Students
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if selected_subject %}
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between">
+        <span><i class="fas fa-users"></i> {{ selected_subject.code }} — {{ selected_date }}</span>
+        <span class="text-muted">{{ students_data|length }} student(s)</span>
+    </div>
+    <div class="card-body">
+        {% if students_data %}
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="subject_id" value="{{ selected_subject.id }}">
+            <input type="hidden" name="date" value="{{ selected_date }}">
+            <div class="mb-3">
+                <button type="button" class="btn btn-sm btn-success" onclick="markAll('Present')"><i class="fas fa-check"></i> All Present</button>
+                <button type="button" class="btn btn-sm btn-danger" onclick="markAll('Absent')"><i class="fas fa-times"></i> All Absent</button>
+            </div>
+            <table class="table align-middle">
+                <thead><tr><th>#</th><th>Roll No</th><th>Name</th><th>Status</th></tr></thead>
+                <tbody>
+                {% for s in students_data %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ s.roll_number }}</td>
+                        <td>{{ s.name }}</td>
+                        <td>
+                            <input type="hidden" name="student_ids" value="{{ s.id }}">
+                            <div class="btn-group" role="group">
+                                <input type="radio" class="btn-check" name="status_{{ s.id }}" id="p_{{ s.id }}" value="Present" {% if s.status == 'Present' %}checked{% endif %}>
+                                <label class="btn btn-outline-success btn-sm" for="p_{{ s.id }}">Present</label>
+                                <input type="radio" class="btn-check" name="status_{{ s.id }}" id="a_{{ s.id }}" value="Absent" {% if s.status == 'Absent' %}checked{% endif %}>
+                                <label class="btn btn-outline-danger btn-sm" for="a_{{ s.id }}">Absent</label>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Attendance</button>
+        </form>
+        {% else %}
+            <div class="alert alert-warning mb-0">No students enrolled in this subject. Enroll via Admin → Subjects.</div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<div class="card">
+    <div class="card-header"><i class="fas fa-history"></i> Recently Marked</div>
+    <div class="card-body p-0">
+        <table class="table mb-0">
+            <thead><tr><th>Student</th><th>Subject</th><th>Date</th><th>Status</th></tr></thead>
+            <tbody>
+            {% for a in recent %}
+                <tr>
+                    <td>{{ a.student.roll_number }} - {{ a.student.user.username }}</td>
+                    <td>{{ a.subject.code }}</td>
+                    <td>{{ a.date }}</td>
+                    <td><span class="badge badge-{{ a.status|lower }}">{{ a.status }}</span></td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="4" class="text-center text-muted py-4">No history yet.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function markAll(status) {
+    document.querySelectorAll('input[type=radio]').forEach(r => {
+        if (r.value === status) r.checked = true;
+    });
+}
+</script>
+{% endblock %}

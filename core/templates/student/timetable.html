@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Timetable{% endblock %}
+{% block page_title %}My Timetable{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table mb-0">
+            <thead><tr><th>Day</th><th>Subject</th><th>Time</th><th>Classroom</th><th>Staff</th></tr></thead>
+            <tbody>
+            {% for t in timetable %}
+                <tr>
+                    <td>{{ t.day }}</td>
+                    <td>{{ t.subject.name }}</td>
+                    <td>{{ t.start_time }} - {{ t.end_time }}</td>
+                    <td>{{ t.classroom }}</td>
+                    <td>{{ t.staff.user.get_full_name|default:"-" }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5" class="text-center text-muted py-4">No timetable available.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block title %}Notices{% endblock %}
+{% block page_title %}Manage Notices{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header">Post Notice</div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="mb-3">
+                        <label class="form-label">{{ field.label }}</label>
+                        {{ field|add_class:"form-control" }}
+                    </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-warning w-100">Post</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-7">
+        {% for n in notices %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h6>{{ n.title }}</h6>
+                <p>{{ n.content }}</p>
+                <small class="text-muted">{{ n.created_at|date:"M d, Y H:i" }} by {{ n.created_by.username }}</small>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-muted">No notices.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

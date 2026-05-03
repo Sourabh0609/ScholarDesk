@@ -1,0 +1,25 @@
+<div class="sidebar">
+    <div class="brand">Scholar<span>Desk</span></div>
+    {% if user.is_student %}
+        <a href="{% url 'student_dashboard' %}"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a>
+        <a href="{% url 'student_attendance' %}"><i class="fas fa-calendar-check"></i> <span>Attendance</span></a>
+        <a href="{% url 'student_marks' %}"><i class="fas fa-chart-line"></i> <span>Marks</span></a>
+        <a href="{% url 'student_notices' %}"><i class="fas fa-bell"></i> <span>Notices</span></a>
+        <a href="{% url 'student_timetable' %}"><i class="fas fa-clock"></i> <span>Timetable</span></a>
+        <a href="{% url 'student_feedback' %}"><i class="fas fa-comment"></i> <span>Feedback</span></a>
+    {% elif user.is_staff_role %}
+        <a href="{% url 'staff_dashboard' %}"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a>
+        <a href="{% url 'staff_attendance' %}"><i class="fas fa-calendar-check"></i> <span>Attendance</span></a>
+        <a href="{% url 'staff_marks' %}"><i class="fas fa-chart-line"></i> <span>Marks</span></a>
+        <a href="{% url 'staff_notices' %}"><i class="fas fa-bell"></i> <span>Notices</span></a>
+        <a href="{% url 'staff_feedback' %}"><i class="fas fa-comment"></i> <span>Feedback</span></a>
+        <a href="{% url 'staff_timetable' %}"><i class="fas fa-clock"></i> <span>Timetable</span></a>
+    {% elif user.is_hod %}
+        <a href="{% url 'hod_dashboard' %}"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a>
+        <a href="{% url 'hod_students' %}"><i class="fas fa-user-graduate"></i> <span>Students</span></a>
+        <a href="{% url 'hod_staff' %}"><i class="fas fa-chalkboard-teacher"></i> <span>Staff</span></a>
+        <a href="{% url 'hod_attendance' %}"><i class="fas fa-calendar-check"></i> <span>Attendance</span></a>
+        <a href="{% url 'hod_marks' %}"><i class="fas fa-chart-line"></i> <span>Marks</span></a>
+        <a href="{% url 'hod_notices' %}"><i class="fas fa-bell"></i> <span>Notices</span></a>
+    {% endif %}
+</div>

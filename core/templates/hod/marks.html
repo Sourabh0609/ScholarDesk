@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}All Marks{% endblock %}
+{% block page_title %}All Marks{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table mb-0">
+            <thead><tr><th>Student</th><th>Subject</th><th>Exam</th><th>Marks</th></tr></thead>
+            <tbody>
+            {% for m in marks %}
+                <tr>
+                    <td>{{ m.student.roll_number }} - {{ m.student.user.username }}</td>
+                    <td>{{ m.subject.code }}</td>
+                    <td>{{ m.exam_type }}</td>
+                    <td><strong>{{ m.marks }}</strong>/100</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="4" class="text-center text-muted py-4">None.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% if marks.has_other_pages %}
+<nav class="mt-3"><ul class="pagination">
+{% if marks.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ marks.previous_page_number }}">Prev</a></li>{% endif %}
+<li class="page-item active"><span class="page-link">{{ marks.number }}/{{ marks.paginator.num_pages }}</span></li>
+{% if marks.has_next %}<li class="page-item"><a class="page-link" href="?page={{ marks.next_page_number }}">Next</a></li>{% endif %}
+</ul></nav>
+{% endif %}
+{% endblock %}

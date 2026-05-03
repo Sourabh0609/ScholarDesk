@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Staff{% endblock %}
+{% block page_title %}All Staff{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table mb-0">
+            <thead><tr><th>Emp ID</th><th>Name</th><th>Email</th><th>Department</th><th>Designation</th></tr></thead>
+            <tbody>
+            {% for s in staff_list %}
+                <tr>
+                    <td>{{ s.employee_id }}</td>
+                    <td>{{ s.user.get_full_name|default:s.user.username }}</td>
+                    <td>{{ s.user.email }}</td>
+                    <td>{{ s.department.name|default:"-" }}</td>
+                    <td>{{ s.designation|default:"-" }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5" class="text-center text-muted py-4">No staff.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}HOD Dashboard{% endblock %}
+{% block page_title %}HOD Dashboard{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-3"><div class="stat-card"><h6>Avg Attendance</h6><h2>{{ avg_attendance }}%</h2></div></div>
+    <div class="col-md-3"><div class="stat-card" style="border-color:#10b981;"><h6>Pass %</h6><h2>{{ pass_percent }}%</h2></div></div>
+    <div class="col-md-3"><div class="stat-card" style="border-color:#f59e0b;"><h6>Total Students</h6><h2>{{ total_students }}</h2></div></div>
+    <div class="col-md-3"><div class="stat-card" style="border-color:#ef4444;"><h6>Total Staff</h6><h2>{{ total_staff }}</h2></div></div>
+</div>
+
+<div class="row">
+    <div class="col-md-7">
+        <div class="card mb-4">
+            <div class="card-header">Attendance Trend (Last 7 Days)</div>
+            <div class="card-body"><canvas id="trendChart" height="120"></canvas></div>
+        </div>
+    </div>
+    <div class="col-md-5">
+        <div class="card mb-4">
+            <div class="card-header">Marks Distribution</div>
+            <div class="card-body"><canvas id="distChart" height="200"></canvas></div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">Quick Links</div>
+    <div class="card-body">
+        <a href="{% url 'hod_students' %}" class="btn btn-outline-primary me-2 mb-2"><i class="fas fa-user-graduate"></i> Students</a>
+        <a href="{% url 'hod_staff' %}" class="btn btn-outline-success me-2 mb-2"><i class="fas fa-chalkboard-teacher"></i> Staff</a>
+        <a href="{% url 'hod_attendance' %}" class="btn btn-outline-warning me-2 mb-2"><i class="fas fa-calendar"></i> Attendance</a>
+        <a href="{% url 'hod_marks' %}" class="btn btn-outline-info me-2 mb-2"><i class="fas fa-chart-line"></i> Marks</a>
+        <a href="{% url 'hod_notices' %}" class="btn btn-outline-danger mb-2"><i class="fas fa-bell"></i> Notices</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+{{ trend_labels|json_script:"trend-labels" }}
+{{ trend_data|json_script:"trend-data" }}
+{{ distribution|json_script:"dist-data" }}
+<script>
+const tlRaw = JSON.parse(document.getElementById('trend-labels').textContent);
+const tdRaw = JSON.parse(document.getElementById('trend-data').textContent);
+const drRaw = JSON.parse(document.getElementById('dist-data').textContent);
+
+const trendLabels = typeof tlRaw === 'string' ? JSON.parse(tlRaw) : tlRaw;
+const trendData   = typeof tdRaw === 'string' ? JSON.parse(tdRaw) : tdRaw;
+const distRaw     = typeof drRaw === 'string' ? JSON.parse(drRaw) : drRaw;
+
+new Chart(document.getElementById('trendChart'), {
+    type: 'line',
+    data: {
+        labels: trendLabels,
+        datasets: [{
+            label: 'Attendance %', data: trendData,
+            borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.2)',
+            fill: true, tension: 0.3
+        }]
+    },
+    options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 }}}
+});
+
+new Chart(document.getElementById('distChart'), {
+    type: 'doughnut',
+    data: {
+        labels: Object.keys(distRaw),
+        datasets: [{ data: Object.values(distRaw), backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#10b981'] }]
+    },
+    options: { responsive: true }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block title %}Student Dashboard{% endblock %}
+{% block page_title %}Student Dashboard{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-4"><div class="stat-card"><h6>Attendance %</h6><h2>{{ attendance_percentage }}%</h2></div></div>
+    <div class="col-md-4"><div class="stat-card" style="border-color:#10b981;"><h6>Average Marks</h6><h2>{{ avg_marks }}</h2></div></div>
+    <div class="col-md-4"><div class="stat-card" style="border-color:#f59e0b;"><h6>Notices</h6><h2>{{ notices_count }}</h2></div></div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">Attendance by Subject</div>
+            <div class="card-body"><canvas id="attendanceChart" height="180"></canvas></div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">Marks by Subject</div>
+            <div class="card-body"><canvas id="marksChart" height="180"></canvas></div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">Recent Notices</div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                {% for n in recent_notices %}
+                    <li class="list-group-item">
+                        <strong>{{ n.title }}</strong>
+                        <small class="text-muted d-block">{{ n.created_at|date:"M d, Y" }}</small>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item text-muted">No notices yet.</li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">Timetable Preview</div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <thead><tr><th>Day</th><th>Subject</th><th>Time</th><th>Room</th></tr></thead>
+                    <tbody>
+                    {% for t in timetable|slice:":5" %}
+                        <tr>
+                            <td>{{ t.day }}</td>
+                            <td>{{ t.subject.code }}</td>
+                            <td>{{ t.start_time }}-{{ t.end_time }}</td>
+                            <td>{{ t.classroom }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="4" class="text-muted text-center">No timetable.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+{{ attendance_chart|json_script:"att-data" }}
+{{ marks_chart|json_script:"mk-data" }}
+<script>
+const attData = JSON.parse(document.getElementById('att-data').textContent || '[]');
+const mkData  = JSON.parse(document.getElementById('mk-data').textContent || '[]');
+const attRaw  = typeof attData === 'string' ? JSON.parse(attData) : attData;
+const mkRaw   = typeof mkData === 'string'  ? JSON.parse(mkData)  : mkData;
+
+new Chart(document.getElementById('attendanceChart'), {
+    type: 'bar',
+    data: {
+        labels: attRaw.map(x => x.subject),
+        datasets: [{ label: 'Attendance %', data: attRaw.map(x => x.percent), backgroundColor: '#3b82f6' }]
+    },
+    options: { scales: { y: { beginAtZero: true, max: 100 }}}
+});
+
+new Chart(document.getElementById('marksChart'), {
+    type: 'line',
+    data: {
+        labels: mkRaw.map(x => x.subject),
+        datasets: [{ label: 'Avg Marks', data: mkRaw.map(x => x.marks),
+            borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.15)', fill: true, tension: 0.3 }]
+    },
+    options: { scales: { y: { beginAtZero: true, max: 100 }}}
+});
+</script>
+{% endblock %}
