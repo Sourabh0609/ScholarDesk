@@ -1,7 +1,7 @@
+asgiref==3.11.1
 Django==4.2.30
-gunicorn
-whitenoise
-django-widget-tweaks
-pillow
-asgiref
-sqlparse
+django-widget-tweaks==1.5.1
+gunicorn==25.3.0
+packaging==26.2
+pillow==12.2.0
+sqlparse==0.5.5
